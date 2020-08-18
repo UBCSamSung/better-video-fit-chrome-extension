@@ -7,9 +7,9 @@ let options = [
     'none'
 ]
 
-function updateIcon(tabId) {
-    console.log(tabId);
-    let key = `number-${tabId}`;
+let key = 'number';
+
+function updateIcon() {
     chrome.storage.sync.get(
         key,
         (data) => {
@@ -17,30 +17,27 @@ function updateIcon(tabId) {
             if (current == null) return;
             chrome.tabs.executeScript({
                 code: `[...document.getElementsByTagName("video")].forEach(e=>{e.style.setProperty("object-fit", "${options[current % options.length]}", "important");});`
-            }, e => console.log(tabId, e));
-            // TODO: Find workaround for YouTube's reassignment of css property when toggling fullscreen
+            }, e => console.log(e));
             chrome.tabs.executeScript({
                 code: `[...document.getElementsByTagName("video")].forEach(e=>{e.style.setProperty("width", "100%", "important");e.style.setProperty("left", "0", "important");});`
-            }, e => console.log(tabId, e));
-            chrome.browserAction.setBadgeText({ text: options[current % options.length], tabId: tabId });
+            }, e => console.log(e));
+            chrome.browserAction.setBadgeText({ text: options[current % options.length] });
         }
     );
 }
 
-function incrementNumber(tabId) {
-    console.log(tabId);
-    let key = `number-${tabId}`;
+function incrementNumber() {
     chrome.storage.sync.get(key, function (data) {
         let current = data[key];
         if (current == null) current = 1;
         current = (current + 1) % options.length;
         chrome.storage.sync.set({ [key]: current }, null);
-        updateIcon(tabId);
+        updateIcon();
     });
 }
 
-function resetNumber(tabId) {
-    let key = `number-${tabId}`;
+function resetNumber() {
+    let key = 'number';
     chrome.storage.sync.set({ [key]: 0 }, null);
 }
 
@@ -62,17 +59,23 @@ function isValidTab(tab) {
 
 chrome.browserAction.onClicked.addListener((tab) => {
     if (!isValidTab(tab)) return;
-    incrementNumber(tab.id)
+    incrementNumber()
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (!isValidTab(tab)) return;
-    if (changeInfo.url) resetNumber(tabId);
-    updateIcon(tabId)
+    updateIcon()
 });
 
 chrome.tabs.onCreated.addListener((tabId, changeInfo, tab) => {
     if (!isValidTab(tab)) return;
-    if (changeInfo.url) resetNumber(tabId);
-    updateIcon(tabId)
+    updateIcon()
+});
+
+chrome.commands.onCommand.addListener((command) => {
+    try {  
+        incrementNumber();
+    } catch (error) {
+        console.log(error);
+    }
 });

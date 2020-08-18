@@ -1,11 +1,10 @@
 {
     "name": "Better Video Fit",
     "version": "1.0",
-    "description": "Chrome extension that toggle video aspect ratio between cover, fill, none, and default",
+    "description": "Google Chrome extension that toggle video scaling options. Source: https://github.com/UBCSamSung/better-video-fit-chrome-extension",
     "permissions": [
         "activeTab",
-        "storage",
-        "alarms"
+        "storage"
     ],
     "background": {
         "scripts": [
@@ -21,6 +20,16 @@
         "32": "icon-32.png",
         "192": "icon-192.png",
         "512": "icon-512.png"
-      },
+    },
+    "commands": {
+        "toggle-feature-foo": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+A",
+                "mac": "Command+Shift+A"
+            },
+            "description": "Toggle feature foo"
+        }
+    },
+    "options_page": "options.html",
     "manifest_version": 2
 }
